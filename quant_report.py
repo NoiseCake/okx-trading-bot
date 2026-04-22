@@ -4,14 +4,14 @@ import requests
 import pandas as pd
 import numpy as np
 
-# ── Credentials ───────────────────────────────────────────────────────────────
-OKX_API_KEY    = "2ce5ef04-9dd9-44b9-9c33-90fdb7877639"
-OKX_SECRET_KEY = "DBEFDB6903D26B3ABCECC10CE976EDA5"
-OKX_PASSPHRASE = "passpoorGH1234@"
-OKX_FLAG       = "1"   # demo account
+# ── Credentials (injected via environment variables) ──────────────────────────
+OKX_API_KEY    = os.environ["OKX_API_KEY"]
+OKX_SECRET_KEY = os.environ["OKX_SECRET_KEY"]
+OKX_PASSPHRASE = os.environ["OKX_PASSPHRASE"]
+OKX_FLAG       = os.environ.get("OKX_FLAG", "1")
 
-TG_TOKEN  = "8740666003:AAFiURpcTW4MFfRajrXjPFbTJGr2ueo__qc"
-TG_CHAT   = "1688179650"
+TG_TOKEN  = os.environ["TG_TOKEN"]
+TG_CHAT   = os.environ["TG_CHAT"]
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def send_telegram(text: str) -> None:
