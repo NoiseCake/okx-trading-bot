@@ -1,0 +1,16 @@
+# Secrets — never commit
+key.env
+.env
+*.env
+
+# Generated at runtime — ephemeral, not source code
+bot_state.json
+trades.db
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+dist/
+build/
