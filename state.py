@@ -4,7 +4,8 @@ import os
 from dataclasses import dataclass, field, fields, asdict
 from datetime import date
 
-STATE_FILE = "bot_state.json"
+DATA_DIR = os.getenv("DATA_DIR", ".")
+STATE_FILE = os.path.join(DATA_DIR, "bot_state.json")
 
 
 @dataclass

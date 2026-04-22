@@ -18,6 +18,14 @@ BALANCE_LOG_INTERVAL = 6     # log balance every N monitor ticks (~6 min)
 _monitor_tick = 0
 
 
+def _run_quant_report() -> None:
+    try:
+        import quant_report
+        quant_report.main()
+    except Exception as e:
+        logger.error(f"Quant report failed: {e}")
+
+
 class TradingBot:
     def __init__(self) -> None:
         init_db()
@@ -251,6 +259,7 @@ class TradingBot:
         self.run_strategy()
         schedule.every(STRATEGY_INTERVAL_MIN).minutes.do(self.run_strategy)
         schedule.every(MONITOR_INTERVAL_SEC).seconds.do(self.monitor_position)
+        schedule.every(12).hours.do(_run_quant_report)
         while True:
             schedule.run_pending()
             time.sleep(1)
