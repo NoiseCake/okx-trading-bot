@@ -93,9 +93,34 @@ class TradingBot:
                 logger.info(f"[{self.inst_id}] Reconciliation: position confirmed — {balance:.8f} {base_ccy}")
         else:
             if balance >= self.min_lot:
-                logger.warning(
-                    f"[{self.inst_id}] Reconciliation: state is flat but OKX shows "
-                    f"{balance:.8f} {base_ccy} — manual position? Bot will not manage it."
+                # Adopt the existing balance as a bot-managed long position.
+                # Use current price as entry proxy and set ATR-based stop/TPs from there.
+                try:
+                    raw   = self.client.get_candlesticks(self.inst_id, bar=self.bar, limit=200)
+                    df    = parse_candles(raw)
+                    price = df["close"].iloc[-1]
+                    atr_v = atr(df).iloc[-1]
+                except Exception as e:
+                    logger.warning(
+                        f"[{self.inst_id}] Reconciliation: found {balance:.8f} {base_ccy} "
+                        f"but could not fetch price/ATR to adopt position: {e}"
+                    )
+                    return
+
+                stop = self.risk.stop_price(price, atr_v, "buy")
+                tps  = self.risk.take_profit_levels(price, "buy")
+
+                self.state.in_position            = True
+                self.state.side                   = "buy"
+                self.state.entry_price            = price
+                self.state.stop_price             = stop
+                self.state.position_size          = round(balance, 8)
+                self.state.original_position_size = round(balance, 8)
+                self.state.take_profits           = tps
+                self.state.save()
+                logger.info(
+                    f"[{self.inst_id}] Reconciliation: adopted {balance:.8f} {base_ccy} "
+                    f"as managed long — entry≈{price:.2f}, stop={stop:.2f}"
                 )
             else:
                 logger.info(f"[{self.inst_id}] Reconciliation: flat state confirmed")
