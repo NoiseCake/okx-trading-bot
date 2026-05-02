@@ -4,70 +4,119 @@ import os
 from dataclasses import dataclass, field, fields, asdict
 from datetime import date
 
+# DATA_DIR points to a Railway persistent volume in production so state survives restarts.
+# Locally it defaults to the current directory.
 DATA_DIR = os.getenv("DATA_DIR", ".")
-STATE_FILE = os.path.join(DATA_DIR, "bot_state.json")
+
+
+def _state_file(inst_id: str) -> str:
+    """Derive the per-instrument state file path, e.g. bot_state_BTC_USDT.json."""
+    return os.path.join(DATA_DIR, f"bot_state_{inst_id.replace('-', '_')}.json")
 
 
 @dataclass
 class BotState:
-    in_position: bool = False
-    side: str = ""                    # "buy" or "sell"
-    entry_price: float = 0.0
-    stop_price: float = 0.0
-    position_size: float = 0.0
-    original_position_size: float = 0.0
+    """
+    All runtime state the bot needs to survive a restart.
+    Saved to a per-instrument JSON file after every position change.
+    """
+
+    # ── Instrument ───────────────────────────────────────────────────────────────
+    inst_id: str = "BTC-USDT"
+
+    # ── Position tracking ────────────────────────────────────────────────────────
+    in_position: bool  = False        # True while we hold an open trade
+    side: str          = ""           # "buy" (long) or "sell" (short)
+    entry_price: float = 0.0          # price at which we entered the trade
+    stop_price: float  = 0.0          # price that triggers the stop-loss exit
+    position_size: float          = 0.0  # current quantity (shrinks after partial closes)
+    original_position_size: float = 0.0  # full size at entry (used to calculate partial-close fractions)
+
+    # ── Take-profit ladder ───────────────────────────────────────────────────────
     take_profits: list = field(default_factory=list)
-    trailing_active: bool = False
-    trailing_high: float = 0.0
-    trailing_stop: float = 0.0
-    trade_id: int = 0
-    entry_regime: str = ""
-    entry_adx: float = 0.0
-    entry_hurst: float = 0.0
-    entry_rsi: float = 0.0
+
+    # ── Trailing stop ────────────────────────────────────────────────────────────
+    trailing_active: bool  = False
+    trailing_high: float   = 0.0
+    trailing_stop: float   = 0.0
+
+    # ── Trade metadata ───────────────────────────────────────────────────────────
+    trade_id: int        = 0
+    entry_regime: str    = ""
+    entry_adx: float     = 0.0
+    entry_hurst: float   = 0.0
+    entry_rsi: float     = 0.0
     entry_atr_val: float = 0.0
-    daily_pnl_pct: float = 0.0
+
+    # ── Daily risk counters (reset each UTC day) ─────────────────────────────────
+    daily_pnl_pct: float    = 0.0
     consecutive_losses: int = 0
-    trades_today: int = 0
-    trade_date: str = ""
+    trades_today: int       = 0
+    trade_date: str         = ""
+
+    # ── Daily reset ──────────────────────────────────────────────────────────────
 
     def reset_daily_if_needed(self) -> None:
+        """Zero out daily counters when the calendar date has changed."""
         today = str(date.today())
         if self.trade_date != today:
-            self.daily_pnl_pct = 0.0
-            self.trades_today = 0
-            self.trade_date = today
+            self.daily_pnl_pct        = 0.0
+            self.trades_today         = 0
+            self.consecutive_losses   = 0
+            self.trade_date           = today
+
+    # ── Position cleanup ─────────────────────────────────────────────────────────
 
     def clear_position(self) -> None:
-        self.in_position = False
-        self.side = ""
-        self.entry_price = 0.0
-        self.stop_price = 0.0
-        self.position_size = 0.0
+        """Reset all position fields back to defaults after a trade is closed."""
+        self.in_position            = False
+        self.side                   = ""
+        self.entry_price            = 0.0
+        self.stop_price             = 0.0
+        self.position_size          = 0.0
         self.original_position_size = 0.0
-        self.take_profits = []
-        self.trailing_active = False
-        self.trailing_high = 0.0
-        self.trailing_stop = 0.0
-        self.trade_id = 0
-        self.entry_regime = ""
-        self.entry_adx = 0.0
-        self.entry_hurst = 0.0
-        self.entry_rsi = 0.0
-        self.entry_atr_val = 0.0
+        self.take_profits           = []
+        self.trailing_active        = False
+        self.trailing_high          = 0.0
+        self.trailing_stop          = 0.0
+        self.trade_id               = 0
+        self.entry_regime           = ""
+        self.entry_adx              = 0.0
+        self.entry_hurst            = 0.0
+        self.entry_rsi              = 0.0
+        self.entry_atr_val          = 0.0
+
+    # ── Persistence ──────────────────────────────────────────────────────────────
 
     def save(self) -> None:
-        with open(STATE_FILE, "w") as f:
+        """Write the full state to the instrument's JSON file."""
+        with open(_state_file(self.inst_id), "w") as f:
             json.dump(asdict(self), f, indent=2)
 
     @classmethod
-    def load(cls) -> BotState:
-        if not os.path.exists(STATE_FILE):
-            return cls()
+    def load(cls, inst_id: str = "BTC-USDT") -> BotState:
+        """
+        Read state from disk. Falls back to a fresh default state if the file is
+        missing or corrupted.
+
+        Backwards compatibility: if the new per-instrument file doesn't exist for
+        BTC-USDT, falls back to the legacy bot_state.json so existing Railway
+        deployments don't lose their state on the first deploy after this change.
+        """
+        path = _state_file(inst_id)
+        if not os.path.exists(path) and inst_id == "BTC-USDT":
+            legacy = os.path.join(DATA_DIR, "bot_state.json")
+            if os.path.exists(legacy):
+                path = legacy
+
+        if not os.path.exists(path):
+            return cls(inst_id=inst_id)
         try:
-            with open(STATE_FILE) as f:
+            with open(path) as f:
                 data = json.load(f)
             valid = {f.name for f in fields(cls)}
-            return cls(**{k: v for k, v in data.items() if k in valid})
+            state = cls(**{k: v for k, v in data.items() if k in valid})
+            state.inst_id = inst_id   # always authoritative from the parameter
+            return state
         except Exception:
-            return cls()
+            return cls(inst_id=inst_id)
