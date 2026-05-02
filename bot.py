@@ -327,7 +327,7 @@ class TradingBot:
 
             log_signal(self.inst_id, signal, regime, curr_adx, curr_hurst, curr_rsi, atr_val, price)
 
-            if signal not in ("buy", "sell"):
+            if signal != "buy":
                 return
 
             if pd.isna(atr_val) or atr_val <= 0:
@@ -335,13 +335,9 @@ class TradingBot:
                 return
 
             # ── Macro trend filter: daily SMA200 ─────────────────────────────────
-            if not pd.isna(curr_sma200):
-                if signal == "buy" and price < curr_sma200:
-                    logger.info(f"[{self.inst_id}] Buy filtered — price {price:.2f} below daily SMA200 {curr_sma200:.2f}")
-                    return
-                if signal == "sell" and price > curr_sma200:
-                    logger.info(f"[{self.inst_id}] Sell filtered — price {price:.2f} above daily SMA200 {curr_sma200:.2f}")
-                    return
+            if not pd.isna(curr_sma200) and price < curr_sma200:
+                logger.info(f"[{self.inst_id}] Buy filtered — price {price:.2f} below daily SMA200 {curr_sma200:.2f}")
+                return
 
             # ── 4H multi-timeframe confirmation ───────────────────────────────────
             # Fetched lazily — only when 1H signal is actionable and passed SMA200
