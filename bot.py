@@ -7,7 +7,15 @@ from client import OKXClient
 from strategy import CombinedStrategy, parse_candles, atr, adx, hurst_exponent, rsi, sma
 from risk import RiskManager
 from state import BotState
-from trade_log import init_db, log_signal, log_trade_open, log_trade_close, log_balance
+from trade_log import (
+    init_db,
+    log_signal,
+    log_trade_open,
+    log_trade_close,
+    log_balance,
+    find_last_open_trade,
+    daily_realized_pnl_usdt,
+)
 
 # ── Constants ─────────────────────────────────────────────────────────────────────
 
@@ -20,6 +28,15 @@ BAR = "1H"   # candle timeframe — all strategy logic is built for 1H bars
 _MIN_LOT = {
     "BTC-USDT": 0.00001,
     "ETH-USDT": 0.001,
+}
+
+# 1H ATR/price baseline per instrument — passed to RiskManager so the volatility
+# scalar in position sizing reflects each asset's actual long-run volatility.
+# ETH is structurally more volatile than BTC; using a single BTC baseline
+# was systematically undersizing ETH positions.
+_BASELINE_VOL = {
+    "BTC-USDT": 0.008,
+    "ETH-USDT": 0.011,
 }
 
 STRATEGY_INTERVAL_MIN = 60    # run the strategy check once per hour (aligned to candle close)
@@ -51,7 +68,7 @@ class TradingBot:
         self.min_lot  = _MIN_LOT.get(inst_id, 0.00001)
         self.client   = OKXClient()
         self.strategy = CombinedStrategy()
-        self.risk     = RiskManager()
+        self.risk     = RiskManager(baseline_vol=_BASELINE_VOL.get(inst_id, 0.010))
         self.state    = BotState.load(inst_id)
         self.state.reset_daily_if_needed()
         self._reconcile_state()           # sync against live OKX balance before trading
@@ -93,37 +110,109 @@ class TradingBot:
                 logger.info(f"[{self.inst_id}] Reconciliation: position confirmed — {balance:.8f} {base_ccy}")
         else:
             if balance >= self.min_lot:
-                # Adopt the existing balance as a bot-managed long position.
-                # Use current price as entry proxy and set ATR-based stop/TPs from there.
-                try:
-                    raw   = self.client.get_candlesticks(self.inst_id, bar=self.bar, limit=200)
-                    df    = parse_candles(raw)
-                    price = df["close"].iloc[-1]
-                    atr_v = atr(df).iloc[-1]
-                except Exception as e:
+                # Recover the bot's prior open trade from the DB so stops/TPs
+                # are rebuilt from the ORIGINAL entry, not the current price.
+                # Refusing to adopt an unrecognised balance is intentional —
+                # fabricating levels from current price has previously closed
+                # underwater positions for "profit" after a price recovery.
+                open_trade = find_last_open_trade(self.inst_id)
+
+                if open_trade is None:
                     logger.warning(
                         f"[{self.inst_id}] Reconciliation: found {balance:.8f} {base_ccy} "
-                        f"but could not fetch price/ATR to adopt position: {e}"
+                        f"but no open trade in DB. NOT adopting — bot stays flat. "
+                        f"Close the position manually if you want the bot to ignore it, "
+                        f"or restore the prior state.json/trades.db before restart."
                     )
                     return
 
-                stop = self.risk.stop_price(price, atr_v, "buy")
-                tps  = self.risk.take_profit_levels(price, "buy")
+                original    = float(open_trade["original_size"] or 0)
+                entry_price = float(open_trade["entry_price"]   or 0)
+                entry_atr   = float(open_trade["entry_atr"]     or 0)
+                trade_id    = int(open_trade["id"])
+
+                if original < self.min_lot or entry_price <= 0 or entry_atr <= 0:
+                    logger.warning(
+                        f"[{self.inst_id}] Reconciliation: open trade #{trade_id} has "
+                        f"missing fields (original_size={original}, entry={entry_price}, "
+                        f"atr={entry_atr}). NOT adopting."
+                    )
+                    return
+
+                if balance > original * 1.05:
+                    logger.warning(
+                        f"[{self.inst_id}] Reconciliation: balance {balance:.8f} exceeds "
+                        f"open trade #{trade_id} original_size {original} by >5%. "
+                        f"Likely external deposit. NOT adopting."
+                    )
+                    return
+
+                stop = self.risk.stop_price(entry_price, entry_atr, "buy")
+                tps  = self.risk.take_profit_levels(entry_price, "buy")
+
+                # Mark prior TP tranches as hit based on how much of the
+                # original position has already been sold off (TP1, TP2 partials
+                # don't update the DB row, so we infer from the size delta).
+                fraction_closed = max(0.0, 1.0 - balance / original)
+                running = 0.0
+                for tp in tps:
+                    running += tp["fraction"]
+                    if running <= fraction_closed + 1e-6:
+                        tp["hit"] = True
 
                 self.state.in_position            = True
                 self.state.side                   = "buy"
-                self.state.entry_price            = price
+                self.state.entry_price            = entry_price
                 self.state.stop_price             = stop
                 self.state.position_size          = round(balance, 8)
-                self.state.original_position_size = round(balance, 8)
+                self.state.original_position_size = round(original, 8)
                 self.state.take_profits           = tps
+                self.state.trade_id               = trade_id
+
+                # If every TP tranche was already hit, trailing was active
+                # before the restart. We've lost the original ratchet level,
+                # so re-arm using current price as the new high.
+                if all(tp["hit"] for tp in tps):
+                    try:
+                        ticker = self.client.get_ticker(self.inst_id)
+                        cur_px = float(ticker["last"])
+                        self.state.trailing_active = True
+                        self.state.trailing_high   = cur_px
+                        self.state.trailing_stop   = round(cur_px * (1 - self.risk.trail_pct), 2)
+                        logger.info(
+                            f"[{self.inst_id}] Trailing stop re-armed at "
+                            f"{self.state.trailing_stop:.2f} (anchored to current price)"
+                        )
+                    except Exception as e:
+                        logger.warning(f"[{self.inst_id}] Could not re-arm trailing stop: {e}")
+
                 self.state.save()
                 logger.info(
-                    f"[{self.inst_id}] Reconciliation: adopted {balance:.8f} {base_ccy} "
-                    f"as managed long — entry≈{price:.2f}, stop={stop:.2f}"
+                    f"[{self.inst_id}] Reconciliation: recovered trade #{trade_id} — "
+                    f"entry={entry_price:.2f}, stop={stop:.2f}, "
+                    f"{fraction_closed:.0%} already closed"
                 )
             else:
                 logger.info(f"[{self.inst_id}] Reconciliation: flat state confirmed")
+
+    def _get_fill_price(self, ord_id: str, fallback: float) -> float:
+        """Look up the actual filled average price for a market order.
+
+        Falls back to the provided price (typically the ticker last) if the
+        order record can't be fetched or avgPx isn't populated yet. Using the
+        true fill price closes a systematic optimism bias in reported PnL —
+        market orders on a wick can fill 10-50bp away from the trigger.
+        """
+        if not ord_id:
+            return fallback
+        try:
+            order  = self.client.get_order(self.inst_id, ord_id)
+            avg_px = float(order.get("avgPx") or 0)
+            if avg_px > 0:
+                return avg_px
+        except Exception as e:
+            logger.warning(f"[{self.inst_id}] Could not fetch avgPx for order {ord_id}: {e}")
+        return fallback
 
     def _equity(self) -> float:
         """Fetch available USDT balance from OKX. Returns 0.0 on failure (non-fatal)."""
@@ -136,9 +225,24 @@ class TradingBot:
             logger.error(f"[{self.inst_id}] Failed to fetch equity: {e}")
         return 0.0
 
-    def _record_close(self, pnl_pct: float) -> None:
-        """Update daily PnL and consecutive-loss counter after every trade close."""
-        self.state.daily_pnl_pct += pnl_pct
+    def _record_close(self, pnl_pct: float, pnl_usdt: float) -> None:
+        """Update daily PnL and consecutive-loss counter after every trade close.
+
+        daily_pnl_pct accumulates equity-drawdown fraction (pnl_usdt / prev_equity)
+        so the circuit breaker's max_daily_loss_pct threshold actually means
+        'X% of account equity lost today', matching the docstring's intent.
+        Partial-close PnL is intentionally not tracked here — undercounting profits
+        is safe for a loss-only kill-switch (the breaker can only fire earlier).
+        """
+        equity = self._equity()
+        if equity > 0:
+            prev_equity = max(equity - pnl_usdt, 1e-9)
+            self.state.daily_pnl_pct += pnl_usdt / prev_equity
+        else:
+            logger.warning(
+                f"[{self.inst_id}] Skipping daily_pnl_pct update — equity fetch returned 0"
+            )
+
         if pnl_pct < 0:
             self.state.consecutive_losses += 1
         else:
@@ -164,29 +268,33 @@ class TradingBot:
             return
 
         try:
-            self.client.place_market_order(self.inst_id, exit_side, _fmt_size(self.state.position_size))
+            order = self.client.place_market_order(self.inst_id, exit_side, _fmt_size(self.state.position_size))
         except Exception as e:
             logger.error(f"[{self.inst_id}] Close order failed ({reason}): {e}")
             return
 
-        if self.state.side == "buy":
-            pnl_pct = (price - self.state.entry_price) / self.state.entry_price
-        else:
-            pnl_pct = (self.state.entry_price - price) / self.state.entry_price
+        fill_price = self._get_fill_price(order.get("ordId", ""), price)
 
-        logger.info(f"[{self.inst_id}] Position closed [{reason}] at {price:.2f} | PnL: {pnl_pct:+.2%}")
+        if self.state.side == "buy":
+            pnl_pct  = (fill_price - self.state.entry_price) / self.state.entry_price
+            pnl_usdt = (fill_price - self.state.entry_price) * self.state.position_size
+        else:
+            pnl_pct  = (self.state.entry_price - fill_price) / self.state.entry_price
+            pnl_usdt = (self.state.entry_price - fill_price) * self.state.position_size
+
+        logger.info(f"[{self.inst_id}] Position closed [{reason}] at {fill_price:.2f} | PnL: {pnl_pct:+.2%}")
 
         if self.state.trade_id:
             log_trade_close(
                 trade_id=self.state.trade_id,
-                exit_price=price,
+                exit_price=fill_price,
                 close_size=self.state.position_size,
                 entry_price=self.state.entry_price,
                 side=self.state.side,
                 close_reason=reason,
             )
 
-        self._record_close(pnl_pct)
+        self._record_close(pnl_pct, pnl_usdt)
         self.state.clear_position()
         self.state.save()
 
@@ -316,6 +424,21 @@ class TradingBot:
         if self.risk.circuit_breaker_triggered(self.state):
             return
 
+        # Cross-instrument breaker: per-instrument BotState only sees its own
+        # PnL, so a synchronised BTC+ETH bad day could otherwise bypass the
+        # daily-loss limit by 2×. Aggregate today's realised PnL from the DB.
+        equity = self._equity()
+        if equity > 0:
+            cross_pnl = daily_realized_pnl_usdt()
+            cross_pct = cross_pnl / equity
+            if cross_pct <= -self.risk.max_daily_loss_pct:
+                logger.warning(
+                    f"[{self.inst_id}] Cross-instrument circuit breaker: "
+                    f"realised PnL across all instruments today is {cross_pct:.2%} "
+                    f"(threshold {-self.risk.max_daily_loss_pct:.2%}) — halting"
+                )
+                return
+
         logger.info(f"[{self.inst_id}] Strategy check — {self.bar}")
         try:
             raw = self.client.get_candlesticks(self.inst_id, bar=self.bar, limit=200)
@@ -393,12 +516,18 @@ class TradingBot:
                 return
 
             # ── Place the entry order ─────────────────────────────────────────────
-            self.client.place_market_order(self.inst_id, signal, _fmt_size(size))
+            order      = self.client.place_market_order(self.inst_id, signal, _fmt_size(size))
+            fill_price = self._get_fill_price(order.get("ordId", ""), price)
+
+            # Recompute stops/TPs from the actual fill so they're not skewed by
+            # slippage between the ticker last and the market-order fill.
+            stop = self.risk.stop_price(fill_price, atr_val, signal)
+            tps  = self.risk.take_profit_levels(fill_price, signal)
 
             trade_id = log_trade_open(
                 inst_id=self.inst_id,
                 side=signal,
-                entry_price=price,
+                entry_price=fill_price,
                 size=size,
                 regime=regime,
                 adx_val=curr_adx,
@@ -410,13 +539,13 @@ class TradingBot:
             # ── Update state so the monitor knows what to watch ───────────────────
             self.state.in_position            = True
             self.state.side                   = signal
-            self.state.entry_price            = price
+            self.state.entry_price            = fill_price
             self.state.stop_price             = stop
             self.state.position_size          = size
             self.state.original_position_size = size
-            self.state.take_profits           = self.risk.take_profit_levels(price, signal)
+            self.state.take_profits           = tps
             self.state.trailing_active        = False
-            self.state.trailing_high          = price
+            self.state.trailing_high          = fill_price
             self.state.trailing_stop          = 0.0
             self.state.trade_id               = trade_id
             self.state.entry_regime           = regime
@@ -427,7 +556,7 @@ class TradingBot:
             self.state.trades_today           += 1
             self.state.save()
 
-            logger.info(f"[{self.inst_id}] Entered {signal.upper()} #{trade_id} | Size: {size} | Stop: {stop:.2f}")
+            logger.info(f"[{self.inst_id}] Entered {signal.upper()} #{trade_id} | Fill: {fill_price:.2f} | Size: {size} | Stop: {stop:.2f}")
             for j, tp in enumerate(self.state.take_profits):
                 logger.info(f"[{self.inst_id}]   TP{j+1}: {tp['price']:.2f} ({tp['fraction']:.0%})")
 

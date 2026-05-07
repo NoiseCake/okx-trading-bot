@@ -177,6 +177,42 @@ def log_trade_close(
     logger.info(f"Trade #{trade_id} logged — PnL: {pnl_pct:+.2%} ({pnl_usdt:+.2f} USDT)")
 
 
+def daily_realized_pnl_usdt() -> float:
+    """
+    Sum pnl_usdt across every trade closed today (UTC). Used by the
+    cross-instrument circuit breaker so a synchronised drawdown on BTC and
+    ETH can't bypass the per-instrument daily-loss limit by 2×.
+
+    Only realised PnL is counted; open positions that are deeply underwater
+    will not trigger the breaker until they actually close.
+    """
+    today_utc = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    with _conn() as con:
+        row = con.execute(
+            "SELECT COALESCE(SUM(pnl_usdt), 0) FROM trades "
+            "WHERE closed_at IS NOT NULL AND substr(closed_at, 1, 10) = ?",
+            (today_utc,),
+        ).fetchone()
+    return float(row[0])
+
+
+def find_last_open_trade(inst_id: str) -> dict | None:
+    """
+    Return the most recent unclosed trade row for this instrument, or None.
+
+    Used by reconciliation on bot startup to recover the original entry price
+    and ATR after a Railway restart, so stops/TPs can be rebuilt from the
+    real entry rather than fabricated from current price.
+    """
+    with _conn() as con:
+        row = con.execute(
+            "SELECT * FROM trades WHERE inst_id=? AND closed_at IS NULL "
+            "ORDER BY id DESC LIMIT 1",
+            (inst_id,),
+        ).fetchone()
+    return dict(row) if row else None
+
+
 # ── Balance ───────────────────────────────────────────────────────────────────────
 
 def log_balance(equity_usdt: float) -> None:

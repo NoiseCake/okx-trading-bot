@@ -89,9 +89,21 @@ class BotState:
     # ── Persistence ──────────────────────────────────────────────────────────────
 
     def save(self) -> None:
-        """Write the full state to the instrument's JSON file."""
-        with open(_state_file(self.inst_id), "w") as f:
+        """Write the full state to the instrument's JSON file atomically.
+
+        Writes to a sibling .tmp path then os.replace() onto the real file so
+        a SIGKILL mid-write can't leave a zero-byte JSON. The previous version
+        (open + truncate + write) could yield an empty file that load() then
+        silently fell back to default state — bot would think it's flat while
+        OKX still held the position.
+        """
+        path = _state_file(self.inst_id)
+        tmp  = path + ".tmp"
+        with open(tmp, "w") as f:
             json.dump(asdict(self), f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
 
     @classmethod
     def load(cls, inst_id: str = "BTC-USDT") -> BotState:

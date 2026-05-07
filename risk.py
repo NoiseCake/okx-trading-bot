@@ -22,12 +22,17 @@ class RiskManager:
         trail_pct: float = 0.007,
         max_daily_loss_pct: float = 0.03,
         max_consecutive_losses: int = 3,
+        baseline_vol: float = 0.008,
     ) -> None:
         self.risk_pct               = risk_pct
         self.atr_multiplier         = atr_multiplier
         self.trail_pct              = trail_pct
         self.max_daily_loss_pct     = max_daily_loss_pct
         self.max_consecutive_losses = max_consecutive_losses
+        # 1H ATR/price baseline used by the volatility scalar in position_size().
+        # Set per-instrument by the caller — BTC ≈ 0.008, ETH ≈ 0.011. Default
+        # value is BTC's, kept for backwards compatibility with existing callers.
+        self.baseline_vol           = baseline_vol
 
     # ── Stop loss ─────────────────────────────────────────────────────────────────
 
@@ -68,10 +73,9 @@ class RiskManager:
         base_size = risk_amount / stop_distance
 
         if atr_val is not None and entry > 0:
-            daily_vol    = atr_val / entry           # ATR as a fraction of current price
-            baseline_vol = 0.008                     # BTC 1H long-run average ~0.8%
-            vol_scalar   = baseline_vol / max(daily_vol, baseline_vol * 0.5)
-            vol_scalar   = min(vol_scalar, 1.5)      # cap upscaling in ultra-low-vol regimes
+            daily_vol    = atr_val / entry                  # ATR as a fraction of current price
+            vol_scalar   = self.baseline_vol / max(daily_vol, self.baseline_vol * 0.5)
+            vol_scalar   = min(vol_scalar, 1.5)             # cap upscaling in ultra-low-vol regimes
             base_size   *= vol_scalar
 
         max_size = (equity * 0.02) / entry           # 2% notional hard cap
@@ -82,14 +86,17 @@ class RiskManager:
     def take_profit_levels(self, entry: float, side: str) -> list[dict]:
         """
         Split the exit into three tranches to lock in gains progressively:
-          TP1 (+1%)  → sell 50% of position — takes risk off immediately
-          TP2 (+2%)  → sell another 30%     — secures more profit
-          TP3 (+3%)  → activate trailing stop on the remaining 20%
+          TP1 (+1%)  → sell 30% of position — takes a slice of risk off
+          TP2 (+2%)  → sell another 40%     — secures the bulk of the profit
+          TP3 (+3%)  → activate trailing stop on the remaining 30%
                        (no immediate close — let the winner run until the trail is hit)
+
+        Fractions chosen so >50% of the position survives past TP1, allowing
+        winners to clear ≥1R given typical BTC 1H ATR ≈ 0.8% (stop ≈ 1.2%, TP1 = +1%).
 
         The 'hit' flag is set to True once that level is reached so we don't double-count.
         """
-        tiers = [(0.01, 0.50), (0.02, 0.30), (0.03, 0.20)]
+        tiers = [(0.01, 0.30), (0.02, 0.40), (0.03, 0.30)]
         levels = []
         for pct, fraction in tiers:
             price = entry * (1 + pct) if side == "buy" else entry * (1 - pct)

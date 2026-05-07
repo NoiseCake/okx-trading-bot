@@ -319,7 +319,7 @@ def main():
     else:
         backlog.append("1. Run walk-forward parameter validation — all indicator periods are unvalidated defaults.")
     backlog.append("2. Add max daily loss limit and drawdown circuit breaker.")
-    backlog.append("3. Validate position state on startup by querying OKX open positions.")
+    backlog.append("3. Implement backtesting harness — required before walk-forward validation in item 1 is possible.")
 
     # ── Build and send the report ──────────────────────────────────────────────────
     report = f"""*OKX Bot Quant Report*
