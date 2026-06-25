@@ -1,0 +1,3502 @@
+[
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "buy",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "sell",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "sell",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "buy",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "buy",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "sell",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "buy",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "buy",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "buy",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "buy",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "transitional"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+},
+{
+"signal": "hold",
+"regime": "ranging"
+},
+{
+"signal": "hold",
+"regime": "trending"
+}
+]
