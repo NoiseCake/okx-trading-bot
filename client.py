@@ -81,33 +81,6 @@ class OKXClient:
         logger.info(f"Order placed — {side.upper()} {size} {inst_id} | ordId={order['ordId']}")
         return order
 
-    def place_limit_order(self, inst_id: str, side: str, size: str, price: str) -> dict:
-        """
-        Submit a limit order that only fills at the specified price or better.
-        Useful for pre-setting take-profit targets without paying market spread.
-        """
-        result = self.trade_api.place_order(
-            instId=inst_id,
-            tdMode="cash",
-            side=side,
-            ordType="limit",
-            sz=size,
-            px=price,
-        )
-        if result["code"] != "0":
-            raise RuntimeError(f"place_order failed: {result['msg']}")
-        order = result["data"][0]
-        logger.info(f"Limit order placed — {side.upper()} {size} {inst_id} @ {price} | ordId={order['ordId']}")
-        return order
-
-    def cancel_order(self, inst_id: str, ord_id: str) -> dict:
-        """Cancel an open order by its OKX order ID."""
-        result = self.trade_api.cancel_order(instId=inst_id, ordId=ord_id)
-        if result["code"] != "0":
-            raise RuntimeError(f"cancel_order failed: {result['msg']}")
-        logger.info(f"Order cancelled — {ord_id}")
-        return result["data"][0]
-
     def get_order(self, inst_id: str, ord_id: str) -> dict:
         """Fetch the current status of a specific order (filled, partially filled, etc.)."""
         result = self.trade_api.get_order(instId=inst_id, ordId=ord_id)

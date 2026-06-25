@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 import os
 from dataclasses import dataclass, field, fields, asdict
-from datetime import date
+from datetime import datetime, timezone
 
 # DATA_DIR points to a Railway persistent volume in production so state survives restarts.
 # Locally it defaults to the current directory.
@@ -57,8 +57,13 @@ class BotState:
     # ── Daily reset ──────────────────────────────────────────────────────────────
 
     def reset_daily_if_needed(self) -> None:
-        """Zero out daily counters when the calendar date has changed."""
-        today = str(date.today())
+        """Zero out daily counters when the UTC calendar date has changed.
+
+        Uses UTC to stay consistent with trade_log's UTC timestamps and the
+        cross-instrument breaker (daily_realized_pnl_usdt) — otherwise the two
+        could disagree on which 'day' it is if the host TZ isn't UTC.
+        """
+        today = str(datetime.now(timezone.utc).date())
         if self.trade_date != today:
             self.daily_pnl_pct        = 0.0
             self.trades_today         = 0

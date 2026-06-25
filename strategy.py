@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from dataclasses import dataclass
 
 
 def parse_candles(raw: list) -> pd.DataFrame:
@@ -87,22 +88,6 @@ def bollinger_bands(
     mid = series.rolling(period).mean()
     std = series.rolling(period).std(ddof=0)
     return mid + num_std * std, mid, mid - num_std * std
-
-
-def macd(
-    series: pd.Series, fast: int = 12, slow: int = 26, signal_period: int = 9
-) -> tuple[pd.Series, pd.Series, pd.Series]:
-    """
-    MACD (Moving Average Convergence Divergence) — a momentum indicator.
-    Returns (MACD line, signal line, histogram).
-
-    MACD line    = fast EMA − slow EMA   (measures short-term vs long-term momentum)
-    Signal line  = 9-period EMA of the MACD line   (smoothed trigger)
-    Histogram    = MACD − signal   (bar chart showing momentum acceleration)
-    """
-    macd_line   = ema(series, fast) - ema(series, slow)
-    signal_line = macd_line.ewm(span=signal_period, adjust=False).mean()
-    return macd_line, signal_line, macd_line - signal_line
 
 
 def adx(df: pd.DataFrame, period: int = 14) -> tuple[pd.Series, pd.Series, pd.Series]:
@@ -198,32 +183,7 @@ def volume_confirmation(df: pd.DataFrame, period: int = 20, threshold: float = 1
     return bool(df["vol"].iloc[-1] / avg_vol.iloc[-1] > threshold)
 
 
-# ── Simple Sub-Strategies ─────────────────────────────────────────────────────────
-
-class SMACrossStrategy:
-    """
-    BUY when the fast SMA crosses above the slow SMA (momentum turning up).
-    SELL when the fast SMA crosses below the slow SMA (momentum turning down).
-    A crossover is only counted on the bar where the sign of (fast - slow) flips.
-    """
-
-    def __init__(self, fast: int = 9, slow: int = 21) -> None:
-        self.fast = fast
-        self.slow = slow
-
-    def signal(self, df: pd.DataFrame) -> str:
-        if len(df) < self.slow + 1:
-            return "hold"       # not enough bars to compute both SMAs
-        fast_sma  = sma(df["close"], self.fast)
-        slow_sma  = sma(df["close"], self.slow)
-        prev_diff = fast_sma.iloc[-2] - slow_sma.iloc[-2]
-        curr_diff = fast_sma.iloc[-1] - slow_sma.iloc[-1]
-        if prev_diff < 0 and curr_diff >= 0:
-            return "buy"        # fast just crossed above slow
-        if prev_diff > 0 and curr_diff <= 0:
-            return "sell"       # fast just crossed below slow
-        return "hold"
-
+# ── Sub-Strategy ──────────────────────────────────────────────────────────────────
 
 class EMACrossStrategy:
     """
@@ -250,6 +210,20 @@ class EMACrossStrategy:
 
 
 # ── Main Strategy ─────────────────────────────────────────────────────────────────
+
+@dataclass
+class Decision:
+    """One strategy evaluation. All indicators are computed once in
+    CombinedStrategy.evaluate() and surfaced here so the bot can log and size
+    from them without recomputing — a single source of truth for the trade
+    signal, the regime label, and the indicator snapshot."""
+    signal: str          # "buy" / "sell" / "hold"
+    regime: str          # "trending" / "ranging" / "transitional"
+    adx: float
+    hurst: float
+    rsi: float
+    atr: float
+
 
 class CombinedStrategy:
     """
@@ -282,23 +256,54 @@ class CombinedStrategy:
         self._ema_cross = EMACrossStrategy(fast=9, slow=21)
 
     def signal(self, df: pd.DataFrame) -> str:
+        """Backwards-compatible thin wrapper — returns just the trade signal.
+        Prefer evaluate() when you also need the regime/indicator snapshot."""
+        return self.evaluate(df).signal
+
+    def evaluate(self, df: pd.DataFrame) -> Decision:
+        """Compute the regime, the trade signal, and the indicator snapshot in a
+        SINGLE pass. The bot consumes the returned indicators for logging and
+        risk sizing instead of recomputing them, so regime and signal are
+        derived in exactly one place and can never drift apart.
+
+        Behaviour is identical to the previous signal() — verified by a
+        golden-master regression test over a synthetic candle corpus. The only
+        change is that indicators are computed once here and returned.
+        """
+        close = df["close"]
+
+        # ── Indicators — computed exactly once ────────────────────────────────────
+        adx_line, plus_di, minus_di = adx(df)
+        curr_adx = adx_line.iloc[-1]
+        atr_val  = atr(df).iloc[-1]
+        curr_rsi = rsi(close).iloc[-1]
+        window   = close.iloc[-self.HURST_WINDOW:] if len(close) >= self.HURST_WINDOW else close
+        h        = hurst_exponent(window)
+
+        regime = self._regime(curr_adx)
+        sig    = self._decide(df, close, curr_adx, plus_di, minus_di, curr_rsi, h)
+
+        return Decision(signal=sig, regime=regime, adx=curr_adx, hurst=h, rsi=curr_rsi, atr=atr_val)
+
+    def _regime(self, curr_adx: float) -> str:
+        """ADX-based regime label. A NaN ADX (warm-up) falls through to
+        transitional, matching the previous bot-side classification exactly."""
+        if curr_adx > self.TREND_THRESHOLD:
+            return "trending"
+        if curr_adx < self.RANGE_THRESHOLD:
+            return "ranging"
+        return "transitional"
+
+    def _decide(self, df, close, curr_adx, plus_di, minus_di, curr_rsi, h) -> str:
+        """The regime-routed decision tree, fed pre-computed indicators. Control
+        flow and check ordering are preserved verbatim from the prior signal()."""
         # Need at least 50 bars for all indicators to have warmed up properly
         if len(df) < 50:
             return "hold"
-
-        close = df["close"]
-
-        # ── Step 1: Determine regime ──────────────────────────────────────────────
-        adx_line, plus_di, minus_di = adx(df)
-        curr_adx = adx_line.iloc[-1]
         if pd.isna(curr_adx):
             return "hold"
 
-        # Hurst on a rolling one-week window (shorter than the full series)
-        window = close.iloc[-self.HURST_WINDOW:] if len(close) >= self.HURST_WINDOW else close
-        h = hurst_exponent(window)
-
-        # ── Step 2: Trending regime logic ─────────────────────────────────────────
+        # ── Trending regime ───────────────────────────────────────────────────────
         if curr_adx > self.TREND_THRESHOLD:
 
             # Hurst gate: if the price process is actually mean-reverting or random,
@@ -312,11 +317,9 @@ class CombinedStrategy:
 
             # +DI/-DI must agree with the crossover direction.
             # A buy signal with sellers in control (+DI < -DI) is a warning sign.
-            curr_plus_di  = plus_di.iloc[-1]
-            curr_minus_di = minus_di.iloc[-1]
-            if ema_signal == "buy"  and curr_plus_di  <= curr_minus_di:
+            if ema_signal == "buy"  and plus_di.iloc[-1]  <= minus_di.iloc[-1]:
                 return "hold"
-            if ema_signal == "sell" and curr_minus_di <= curr_plus_di:
+            if ema_signal == "sell" and minus_di.iloc[-1] <= plus_di.iloc[-1]:
                 return "hold"
 
             # Volume must confirm — a crossover on low volume often fades
@@ -324,7 +327,6 @@ class CombinedStrategy:
                 return "hold"
 
             # RSI guard: avoid buying into overbought or selling into oversold extremes
-            curr_rsi = rsi(close).iloc[-1]
             if pd.isna(curr_rsi):
                 return "hold"
             if ema_signal == "buy"  and curr_rsi > 70:
@@ -334,7 +336,7 @@ class CombinedStrategy:
 
             return ema_signal
 
-        # ── Step 3: Ranging regime logic ──────────────────────────────────────────
+        # ── Ranging regime ────────────────────────────────────────────────────────
         elif curr_adx < self.RANGE_THRESHOLD:
 
             # Hurst gate: if price is actually trending, BB mean-reversion trades
@@ -348,7 +350,6 @@ class CombinedStrategy:
             prev_lower = bb_lower.iloc[-2]
             curr_price = close.iloc[-1]
 
-            curr_rsi = rsi(close).iloc[-1]
             if any(pd.isna(v) for v in [curr_rsi, prev_upper, prev_lower]):
                 return "hold"
 
@@ -361,5 +362,5 @@ class CombinedStrategy:
 
             return "hold"
 
-        # ── Step 4: Transitional regime — sit out ────────────────────────────────
+        # ── Transitional regime — sit out ─────────────────────────────────────────
         return "hold"

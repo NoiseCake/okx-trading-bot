@@ -13,8 +13,11 @@ OKX_SECRET_KEY = os.environ["OKX_SECRET_KEY"]
 OKX_PASSPHRASE = os.environ["OKX_PASSPHRASE"]
 OKX_FLAG       = os.environ.get("OKX_FLAG", "1")   # "1" = paper, "0" = live
 
-TG_TOKEN = os.environ["TG_TOKEN"]    # Telegram bot token
-TG_CHAT  = os.environ["TG_CHAT"]     # Telegram chat/channel ID to send the report to
+# .strip() guards against a trailing newline/space pasted into the Railway env
+# panel — an unstripped "\n" in the token builds an invalid URL and every send
+# fails silently.
+TG_TOKEN = os.environ["TG_TOKEN"].strip()    # Telegram bot token
+TG_CHAT  = os.environ["TG_CHAT"].strip()     # Telegram chat/channel ID to send the report to
 
 
 # ── Telegram helper ───────────────────────────────────────────────────────────────
@@ -26,11 +29,17 @@ def send_telegram(text: str) -> None:
     """
     url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
     for i in range(0, len(text), 4000):
-        requests.post(
+        resp = requests.post(
             url,
             json={"chat_id": TG_CHAT, "text": text[i:i+4000], "parse_mode": "Markdown"},
             timeout=10,
         )
+        # Surface failures instead of swallowing them. A bad token, wrong chat
+        # id, or a Markdown parse error used to fail with no message and no log.
+        if not resp.ok or not resp.json().get("ok"):
+            raise RuntimeError(
+                f"Telegram sendMessage failed: HTTP {resp.status_code} — {resp.text[:300]}"
+            )
 
 
 # ── Indicator helpers (duplicated from strategy.py to keep this file standalone) ──

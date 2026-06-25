@@ -3,8 +3,9 @@ import schedule
 import pandas as pd
 from loguru import logger
 
+import config
 from client import OKXClient
-from strategy import CombinedStrategy, parse_candles, atr, adx, hurst_exponent, rsi, sma
+from strategy import CombinedStrategy, parse_candles, sma
 from risk import RiskManager
 from state import BotState
 from trade_log import (
@@ -447,26 +448,29 @@ class TradingBot:
             # Daily candles for the macro trend filter (SMA200 on 1D bars ≈ 200-day average)
             raw_daily   = self.client.get_candlesticks(self.inst_id, bar="1D", limit=250)
             df_daily    = parse_candles(raw_daily)
-            curr_sma200 = sma(df_daily["close"], 200).iloc[-1]
-            sma200_str  = f"{curr_sma200:.2f}" if not pd.isna(curr_sma200) else "N/A"
+            sma200_series = sma(df_daily["close"], 200)
+            curr_sma200   = sma200_series.iloc[-1]
+            # Slope over the last 5 daily bars: ≥0 means the macro trend is flat
+            # or rising. Used to gate mean-reversion buys (see SMA200 filter below).
+            sma200_rising = (
+                len(sma200_series) >= 5
+                and not pd.isna(curr_sma200)
+                and not pd.isna(sma200_series.iloc[-5])
+                and curr_sma200 >= sma200_series.iloc[-5]
+            )
+            sma200_str    = f"{curr_sma200:.2f}" if not pd.isna(curr_sma200) else "N/A"
 
-            # ── Compute indicators for logging and signal generation ───────────────
-            atr_val            = atr(df).iloc[-1]
-            adx_line, _, _     = adx(df)
-            curr_adx           = adx_line.iloc[-1]
-            window             = df["close"].iloc[-168:] if len(df) >= 168 else df["close"]
-            curr_hurst         = hurst_exponent(window)
-            curr_rsi           = rsi(df["close"]).iloc[-1]
-            price              = df["close"].iloc[-1]
-
-            if curr_adx > CombinedStrategy.TREND_THRESHOLD:
-                regime = "trending"
-            elif curr_adx < CombinedStrategy.RANGE_THRESHOLD:
-                regime = "ranging"
-            else:
-                regime = "transitional"
-
-            signal = self.strategy.signal(df)
+            # ── Evaluate strategy — regime, signal, and indicators in one pass ──────
+            # CombinedStrategy.evaluate() is the single source of truth; the bot no
+            # longer recomputes ADX/Hurst/RSI/ATR or re-derives the regime here.
+            decision   = self.strategy.evaluate(df)
+            signal     = decision.signal
+            regime     = decision.regime
+            curr_adx   = decision.adx
+            curr_hurst = decision.hurst
+            curr_rsi   = decision.rsi
+            atr_val    = decision.atr
+            price      = df["close"].iloc[-1]
             logger.info(
                 f"[{self.inst_id}] Signal: {signal.upper()} | Regime: {regime} | ADX: {curr_adx:.1f} "
                 f"| H: {curr_hurst:.2f} | RSI: {curr_rsi:.1f} | Price: {price:.2f} "
@@ -483,8 +487,20 @@ class TradingBot:
                 return
 
             # ── Macro trend filter: daily SMA200 ─────────────────────────────────
-            if not pd.isna(curr_sma200) and price < curr_sma200:
-                logger.info(f"[{self.inst_id}] Buy filtered — price {price:.2f} below daily SMA200 {curr_sma200:.2f}")
+            # Trend-following (trending regime, EMA-cross) buys must respect the
+            # macro trend — never buy momentum into a downtrend (price < SMA200).
+            # Mean-reversion (ranging regime, BB) buys exist to buy oversold dips,
+            # so they are NOT gated on price-vs-SMA200 — that would neutralise the
+            # strategy in exactly the conditions it is built for. They are instead
+            # gated on SMA200 *slope*: a dip-buy is only allowed when the macro
+            # trend is flat or rising, never into an actively falling market
+            # (where mean reversion degrades into catching a falling knife).
+            if regime == "ranging":
+                if not sma200_rising:
+                    logger.info(f"[{self.inst_id}] Mean-reversion buy filtered — daily SMA200 falling (no dip-buys into a downtrend)")
+                    return
+            elif not pd.isna(curr_sma200) and price < curr_sma200:
+                logger.info(f"[{self.inst_id}] Trend buy filtered — price {price:.2f} below daily SMA200 {curr_sma200:.2f}")
                 return
 
             # ── 4H multi-timeframe confirmation ───────────────────────────────────
@@ -494,8 +510,14 @@ class TradingBot:
                 df_4h     = parse_candles(raw_4h)
                 signal_4h = self.strategy.signal(df_4h)
             except Exception as e:
+                # Fail CLOSED for mean-reversion buys — letting an unconfirmed
+                # dip-buy through on a transient error is the worst case here.
+                # Trend buys keep the original fail-open behaviour.
+                if regime == "ranging":
+                    logger.warning(f"[{self.inst_id}] 4H fetch failed — failing closed on mean-reversion buy: {e}")
+                    return
                 logger.warning(f"[{self.inst_id}] 4H fetch failed — skipping MTF check: {e}")
-                signal_4h = signal   # fail open
+                signal_4h = signal   # fail open for trend buys
 
             if signal_4h != signal:
                 logger.info(f"[{self.inst_id}] 1H {signal.upper()} not confirmed on 4H ({signal_4h.upper()}) — skipping")
@@ -578,6 +600,7 @@ def main() -> None:
     Shared task:
       - quant report    : every 12 hours (Telegram summary)
     """
+    config.validate()   # fail fast with a clear message if credentials are missing
     init_db()
 
     bots = [TradingBot(inst_id) for inst_id in INSTRUMENTS]
