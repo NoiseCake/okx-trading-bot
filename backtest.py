@@ -115,10 +115,11 @@ def _data_path(inst_id: str, bar: str) -> str:
     return os.path.join(DATA_DIR, f"{inst_id}_{bar}.csv")
 
 
-def cmd_fetch() -> None:
+def cmd_fetch(insts: list[str] | None = None, start_override: str | None = None) -> None:
     os.makedirs(DATA_DIR, exist_ok=True)
-    for inst in INSTRUMENTS:
+    for inst in insts or INSTRUMENTS:
         for bar, start in FETCH_SPEC:
+            start = start_override or start
             t0 = time.time()
             df = fetch_history(inst, bar, start)
             gaps = int((df["ts"].diff().dropna() != BAR_MS[bar]).sum())
@@ -489,11 +490,17 @@ def simulate(data: dict, scfg: SimCfg, stcfg: StratCfg, start: str | None = None
     fee = scfg.fee_bp / 10_000.0
     slip = scfg.slip_bp / 10_000.0
 
+    # Live rounds stop/TP prices to 2 decimals — fine at BTC/ETH scale (<0.01 bp
+    # error) but disastrous for sub-dollar assets (DOGE at $0.12 → 4% error).
+    # 8 significant digits keeps live parity on majors and stays exact on the rest.
+    def rpx(x: float) -> float:
+        return float(f"{x:.8g}")
+
     def tp_ladder(entry_fill: float, stop_dist: float) -> list[dict]:
         if scfg.tp_mode == "pct":
-            return [{"price": round(entry_fill * (1 + p), 2), "fraction": f, "hit": False}
+            return [{"price": rpx(entry_fill * (1 + p)), "fraction": f, "hit": False}
                     for p, f in scfg.tp_tiers_pct]
-        return [{"price": round(entry_fill + r * stop_dist, 2), "fraction": f, "hit": False}
+        return [{"price": rpx(entry_fill + r * stop_dist), "fraction": f, "hit": False}
                 for r, f in scfg.tp_tiers_atr]
 
     def sell_fill(level: float) -> float:
@@ -575,7 +582,7 @@ def simulate(data: dict, scfg: SimCfg, stcfg: StratCfg, start: str | None = None
                                 # live anchors at the 1m wick high at touch time).
                                 p.trailing_active = True
                                 p.trailing_high = tp["price"]
-                                p.trailing_stop = round(tp["price"] * (1 - scfg.trail_pct), 2)
+                                p.trailing_stop = rpx(tp["price"] * (1 - scfg.trail_pct))
                             else:
                                 close_size = round(p.original_size * tp["fraction"], 8)
                                 fill = sell_fill(tp["price"])
@@ -593,7 +600,7 @@ def simulate(data: dict, scfg: SimCfg, stcfg: StratCfg, start: str | None = None
                             elif wh > p.trailing_high:
                                 p.trailing_high = wh
                                 p.trailing_stop = max(p.trailing_stop,
-                                                      round(wh * (1 - scfg.trail_pct), 2))
+                                                      rpx(wh * (1 - scfg.trail_pct)))
 
             # ── 2. Fill a pending entry during/at the close of this bar ──────────
             q = pending[inst]
@@ -611,7 +618,7 @@ def simulate(data: dict, scfg: SimCfg, stcfg: StratCfg, start: str | None = None
                     fee_usdt = notional * entry_fee
                     cash -= notional + fee_usdt
                     stop_dist = q["atr"] * scfg.atr_mult
-                    stop = round(fill - stop_dist, 2)
+                    stop = rpx(fill - stop_dist)
                     pos[inst] = _Pos(
                         inst=inst, entry=fill, stop=stop, size=q["size"],
                         original_size=q["size"], tps=tp_ladder(fill, stop_dist),
@@ -666,7 +673,7 @@ def simulate(data: dict, scfg: SimCfg, stcfg: StratCfg, start: str | None = None
             if equity <= 0:
                 funnel["size"] += 1
                 continue
-            stop_for_size = round(sig_close - sig_atr * scfg.atr_mult, 2)
+            stop_for_size = rpx(sig_close - sig_atr * scfg.atr_mult)
             stop_distance = abs(sig_close - stop_for_size)
             if stop_distance < 1e-9:
                 funnel["size"] += 1
@@ -818,7 +825,9 @@ def cmd_validate(db_path: str, sample: int = 0) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    sub.add_parser("fetch")
+    fp = sub.add_parser("fetch")
+    fp.add_argument("--insts", nargs="+", default=None, help="instrument ids (default: INSTRUMENTS)")
+    fp.add_argument("--start", default=None, help="override start date for all bars, e.g. 2020-01-01")
     runp = sub.add_parser("run")
     runp.add_argument("--start", default=None)
     runp.add_argument("--end", default=None)
@@ -829,7 +838,7 @@ def main() -> None:
     args = ap.parse_args()
 
     if args.cmd == "fetch":
-        cmd_fetch()
+        cmd_fetch(args.insts, args.start)
     elif args.cmd == "validate":
         cmd_validate(args.db, args.sample)
     elif args.cmd == "run":
