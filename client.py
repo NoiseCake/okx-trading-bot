@@ -63,6 +63,11 @@ class OKXClient:
         side: 'buy' or 'sell'
         size: quantity in base currency (e.g. '0.01' means 0.01 BTC)
         tdMode='cash' means spot trading with no leverage.
+
+        tgtCcy='base_ccy' is required: OKX interprets sz on spot market BUYS as
+        the QUOTE amount (USDT) unless told otherwise, so without it a buy of
+        '0.03' would purchase 0.03 USDT worth of BTC — not 0.03 BTC — while the
+        bot records a 0.03 BTC position. (Sells already default to base_ccy.)
         """
         result = self.trade_api.place_order(
             instId=inst_id,
@@ -70,6 +75,7 @@ class OKXClient:
             side=side,
             ordType="market",
             sz=size,
+            tgtCcy="base_ccy",
         )
         if result["code"] != "0":
             detail = ""

@@ -5,7 +5,11 @@ key.env
 
 # Generated at runtime — ephemeral, not source code
 bot_state.json
+bot_state_*.json
 trades.db
+
+# Backtest candle cache (multi-MB CSVs, refetchable via `python3 backtest.py fetch`)
+data/
 
 # Python
 __pycache__/
