@@ -1,5 +1,6 @@
 import okx.Account as Account
 import okx.MarketData as MarketData
+import okx.PublicData as PublicData
 import okx.Trade as Trade
 from loguru import logger
 from config import API_KEY, SECRET_KEY, PASSPHRASE, FLAG
@@ -15,6 +16,7 @@ class OKXClient:
         self.account_api = Account.AccountAPI(API_KEY, SECRET_KEY, PASSPHRASE, False, FLAG)
         self.market_api  = MarketData.MarketAPI(API_KEY, SECRET_KEY, PASSPHRASE, False, FLAG)
         self.trade_api   = Trade.TradeAPI(API_KEY, SECRET_KEY, PASSPHRASE, False, FLAG)
+        self.public_api  = PublicData.PublicAPI(API_KEY, SECRET_KEY, PASSPHRASE, False, FLAG)
         mode = "PAPER TRADING" if FLAG == "1" else "LIVE TRADING"
         logger.info(f"OKX client initialized — {mode}")
 
@@ -55,19 +57,35 @@ class OKXClient:
                 return float(detail.get("availBal") or 0)
         return 0.0
 
+    def get_spot_specs(self, inst_ids: list[str]) -> dict:
+        """Return {inst_id: {"lotSz": float, "minSz": float}} for spot instruments.
+
+        Live lot metadata replaces the old hardcoded dict — with 8 instruments a
+        stale entry would silently reject or mis-round orders.
+        """
+        result = self.public_api.get_instruments(instType="SPOT")
+        if result["code"] != "0":
+            raise RuntimeError(f"get_instruments failed: {result['msg']}")
+        want = set(inst_ids)
+        return {d["instId"]: {"lotSz": float(d["lotSz"]), "minSz": float(d["minSz"])}
+                for d in result["data"] if d["instId"] in want}
+
     # ── Orders ───────────────────────────────────────────────────────────────────
 
-    def place_market_order(self, inst_id: str, side: str, size: str) -> dict:
+    def place_market_order(self, inst_id: str, side: str, size: str,
+                           tgt_ccy: str = "base_ccy") -> dict:
         """
         Submit a market order that fills immediately at the best available price.
         side: 'buy' or 'sell'
-        size: quantity in base currency (e.g. '0.01' means 0.01 BTC)
+        size: quantity in base currency, or in USDT when tgt_ccy='quote_ccy'
         tdMode='cash' means spot trading with no leverage.
 
-        tgtCcy='base_ccy' is required: OKX interprets sz on spot market BUYS as
+        tgtCcy defaults to 'base_ccy': OKX interprets sz on spot market BUYS as
         the QUOTE amount (USDT) unless told otherwise, so without it a buy of
         '0.03' would purchase 0.03 USDT worth of BTC — not 0.03 BTC — while the
         bot records a 0.03 BTC position. (Sells already default to base_ccy.)
+        The xsmom rebalancer passes tgt_ccy='quote_ccy' deliberately: its buys
+        are sized as USDT notional.
         """
         result = self.trade_api.place_order(
             instId=inst_id,
@@ -75,7 +93,7 @@ class OKXClient:
             side=side,
             ordType="market",
             sz=size,
-            tgtCcy="base_ccy",
+            tgtCcy=tgt_ccy,
         )
         if result["code"] != "0":
             detail = ""

@@ -1,19 +1,24 @@
+import math
 import time
+from datetime import timedelta
+
 import schedule
 import pandas as pd
 from loguru import logger
 
 import config
+import xsmom
 from client import OKXClient
 from strategy import CombinedStrategy, parse_candles, sma
 from risk import RiskManager
-from state import BotState
+from state import BotState, XsmomState
 from trade_log import (
     init_db,
     log_signal,
     log_trade_open,
     log_trade_close,
     log_balance,
+    log_rebalance,
     find_last_open_trade,
     daily_realized_pnl_usdt,
 )
@@ -586,6 +591,246 @@ class TradingBot:
             logger.error(f"[{self.inst_id}] Strategy error: {e}")
 
 
+# ── XSMOM mode (RP2 X1 paper trade) ──────────────────────────────────────────────
+
+class XsmomBot:
+    """
+    X1 weekly cross-sectional momentum, portfolio-level (see the RP2 vault note
+    for the frozen protocol). Decisions at the Thursday 16:00 UTC daily close;
+    the only actions are weekly rebalances — no stops, no TPs, no monitor loop.
+
+    Execution is delta-based and therefore idempotent: a crash mid-rebalance
+    re-runs against current holdings next tick and converges on the same
+    targets. `last_rebalance` is only advanced after a completed pass.
+    """
+
+    DUST_FRACTION = 0.001          # skip orders below 0.1% of portfolio value
+    MIN_ORDER_USDT = 10.0          # and below the exchange-practical floor
+
+    def __init__(self) -> None:
+        self.client = OKXClient()
+        self.state = XsmomState.load()
+        self.specs: dict | None = None   # inst -> {lotSz, minSz}; fetched lazily, fail closed
+        self._load_specs()
+        self._reconcile()
+
+    # ── Setup / helpers ───────────────────────────────────────────────────────────
+
+    def _load_specs(self) -> None:
+        try:
+            self.specs = self.client.get_spot_specs(xsmom.UNIVERSE)
+            missing = [i for i in xsmom.UNIVERSE if i not in self.specs]
+            if missing:
+                raise RuntimeError(f"instruments missing from spec response: {missing}")
+        except Exception as e:
+            self.specs = None
+            logger.warning(f"[xsmom] Could not fetch instrument specs (will retry): {e}")
+
+    def _reconcile(self) -> None:
+        """Boot check: report drift between holdings and the saved targets.
+        Never trades — the next scheduled rebalance converges on targets anyway."""
+        try:
+            usdt, holdings, value = self._portfolio()
+        except Exception as e:
+            logger.warning(f"[xsmom] Reconciliation skipped — portfolio fetch failed: {e}")
+            return
+        held = {i: bal * px for i, (bal, px) in holdings.items() if bal * px > 1.0}
+        logger.info(
+            f"[xsmom] Reconciliation: value={value:.2f} USDT (cash {usdt:.2f}) | "
+            f"held: {({i: round(v, 2) for i, v in held.items()}) or 'none'} | "
+            f"targets({self.state.last_rebalance or 'never'}): {self.state.targets or 'none'}"
+        )
+        for inst, v in held.items():
+            if value > 0 and v / value > self.state.targets.get(inst, 0.0) + 0.02:
+                logger.warning(
+                    f"[xsmom] Reconciliation: {inst} at {v / value:.1%} of portfolio exceeds "
+                    f"target {self.state.targets.get(inst, 0.0):.0%} — will converge at the "
+                    f"next rebalance"
+                )
+
+    def _portfolio(self) -> tuple[float, dict, float]:
+        """(usdt_available, {inst: (base_balance, last_price)}, total_value)."""
+        balance = self.client.get_balance()
+        by_ccy = {d.get("ccy"): float(d.get("availBal") or 0)
+                  for d in balance.get("details", [])}
+        usdt = by_ccy.get("USDT", 0.0)
+        holdings, value = {}, usdt
+        for inst in xsmom.UNIVERSE:
+            bal = by_ccy.get(inst.split("-")[0], 0.0)
+            px = 0.0
+            if bal > 0:
+                px = float(self.client.get_ticker(inst)["last"])
+                value += bal * px
+            holdings[inst] = (bal, px)
+        return usdt, holdings, value
+
+    def _confirmed_closes(self, inst: str, limit: int = 240) -> pd.DataFrame:
+        raw = self.client.get_candlesticks(inst, bar="1D", limit=limit)
+        return parse_candles(raw)
+
+    def _fill_price(self, inst: str, ord_id: str) -> float:
+        try:
+            order = self.client.get_order(inst, ord_id)
+            return float(order.get("avgPx") or 0)
+        except Exception as e:
+            logger.warning(f"[xsmom] Could not fetch avgPx for {inst} {ord_id}: {e}")
+            return 0.0
+
+    # ── Scheduled entry points ────────────────────────────────────────────────────
+
+    def tick(self) -> None:
+        """Every 5 minutes: is there a confirmed daily close we owe a rebalance
+        for? Cheap clock check against BTC only; the full 8-asset fetch happens
+        on rebalance days."""
+        try:
+            df = self._confirmed_closes("BTC-USDT", limit=3)
+            close_date = (df["ts"].iloc[-1] + timedelta(days=1)).date()
+        except Exception as e:
+            logger.error(f"[xsmom] Clock fetch failed: {e}")
+            return
+        due = xsmom.latest_due_date(close_date)
+        if self.state.last_rebalance >= str(due):
+            return
+        if self.specs is None:
+            self._load_specs()
+            if self.specs is None:
+                logger.error("[xsmom] No instrument specs — rebalance blocked (fail closed)")
+                return
+        self._rebalance(close_date, catch_up=(close_date != due))
+
+    def log_snapshot(self) -> None:
+        """Hourly equity snapshot — total portfolio value, not just USDT."""
+        try:
+            _, _, value = self._portfolio()
+            if value > 0:
+                log_balance(value)
+        except Exception as e:
+            logger.warning(f"[xsmom] Snapshot failed: {e}")
+
+    # ── Rebalance ─────────────────────────────────────────────────────────────────
+
+    def _rebalance(self, close_date, catch_up: bool) -> None:
+        label = f"catch-up for missed {xsmom.latest_due_date(close_date)}" if catch_up \
+            else "scheduled"
+        logger.info(f"[xsmom] Rebalance ({label}) on close {close_date}")
+        try:
+            closes, decision_close = {}, {}
+            expected_ts = None
+            for inst in xsmom.UNIVERSE:
+                df = self._confirmed_closes(inst)
+                if expected_ts is None:
+                    expected_ts = df["ts"].iloc[-1]
+                elif df["ts"].iloc[-1] != expected_ts:
+                    logger.warning(
+                        f"[xsmom] {inst} latest confirmed bar {df['ts'].iloc[-1]} != "
+                        f"{expected_ts} — retrying next tick")
+                    return
+                closes[inst] = df["close"].to_numpy()
+                decision_close[inst] = float(df["close"].iloc[-1])
+
+            mom, close, sma200 = xsmom.compute_inputs(closes)
+            targets = xsmom.select_targets(mom, close, sma200)
+            score_line = "  ".join(
+                f"{i.split('-')[0]}:{mom[i]:+.1%}{'✓' if i in targets else ''}"
+                for i in xsmom.UNIVERSE if pd.notna(mom[i]))
+            logger.info(f"[xsmom] Scores(28d): {score_line}")
+            logger.info(f"[xsmom] Targets: {targets or '100% cash'}")
+
+            orders = self._execute(targets, decision_close, mom, str(close_date), catch_up)
+
+            self.state.targets = targets
+            self.state.last_rebalance = str(close_date)
+            self.state.save()
+            self._notify(str(close_date), mom, targets, orders)
+        except Exception as e:
+            logger.error(f"[xsmom] Rebalance failed (will retry next tick): {e}")
+
+    def _execute(self, targets: dict, decision_close: dict, mom: dict,
+                 decision_date: str, catch_up: bool) -> list[str]:
+        """Move holdings to target weights: sells first (frees USDT), then buys.
+        Buys are sized in quote notional (tgtCcy=quote_ccy)."""
+        usdt, holdings, value = self._portfolio()
+        floor = max(value * self.DUST_FRACTION, self.MIN_ORDER_USDT)
+        orders: list[str] = []
+
+        def note(inst, side, size, fill, notional):
+            log_rebalance(decision_date, inst, side, size, fill,
+                          decision_close.get(inst, 0.0), notional,
+                          targets.get(inst, 0.0), float(mom.get(inst) or 0.0),
+                          catch_up=catch_up, dry_run=config.DRY_RUN)
+            slip = (f" slip={(fill / decision_close[inst] - 1) * 1e4:+.0f}bp"
+                    if fill > 0 and decision_close.get(inst) else "")
+            orders.append(f"{side.upper()} {inst} ≈{notional:.0f} USDT{slip}")
+
+        # Sells
+        for inst in xsmom.UNIVERSE:
+            bal, px = holdings[inst]
+            if px <= 0:
+                continue
+            delta = targets.get(inst, 0.0) * value - bal * px
+            if delta >= -floor:
+                continue
+            spec = self.specs[inst]
+            size = min(bal, -delta / px)
+            if targets.get(inst, 0.0) == 0.0:
+                size = bal                              # full exit — no dust left behind
+            size = math.floor(size / spec["lotSz"]) * spec["lotSz"]
+            if size < spec["minSz"]:
+                continue
+            if config.DRY_RUN:
+                logger.info(f"[xsmom] DRY RUN — would SELL {size} {inst}")
+                note(inst, "sell", size, 0.0, size * px)
+                continue
+            order = self.client.place_market_order(inst, "sell", _fmt_size(size))
+            fill = self._fill_price(inst, order.get("ordId", ""))
+            note(inst, "sell", size, fill, size * (fill or px))
+
+        # Refresh cash after sells, then buys
+        if not config.DRY_RUN:
+            time.sleep(2)
+        usdt, holdings, value = self._portfolio() if not config.DRY_RUN else (usdt, holdings, value)
+        spendable = usdt * 0.998                        # fee headroom
+        for inst in xsmom.UNIVERSE:
+            bal, px = holdings[inst]
+            if px <= 0:
+                try:
+                    px = float(self.client.get_ticker(inst)["last"])
+                except Exception:
+                    continue
+            delta = targets.get(inst, 0.0) * value - bal * px
+            if delta <= floor:
+                continue
+            notional = min(delta, spendable)
+            if notional < floor:
+                continue
+            if config.DRY_RUN:
+                logger.info(f"[xsmom] DRY RUN — would BUY {notional:.2f} USDT of {inst}")
+                note(inst, "buy", notional / px, 0.0, notional)
+                continue
+            order = self.client.place_market_order(
+                inst, "buy", f"{notional:.2f}", tgt_ccy="quote_ccy")
+            fill = self._fill_price(inst, order.get("ordId", ""))
+            note(inst, "buy", notional / (fill or px), fill, notional)
+            spendable -= notional
+
+        if not orders:
+            logger.info("[xsmom] Rebalance: already on target — no orders")
+        return orders
+
+    def _notify(self, decision_date: str, mom: dict, targets: dict,
+                orders: list[str]) -> None:
+        try:
+            from quant_report import send_telegram
+            _, _, value = self._portfolio()
+            lines = [f"*XSMOM rebalance — {decision_date}*",
+                     f"Targets: {targets or '100% cash'}",
+                     f"Portfolio: {value:,.0f} USDT"]
+            lines += [f"• {o}" for o in orders] or ["• no orders (on target)"]
+            send_telegram("\n".join(lines))
+        except Exception as e:
+            logger.warning(f"[xsmom] Telegram notify failed: {e}")
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -603,13 +848,21 @@ def main() -> None:
     config.validate()   # fail fast with a clear message if credentials are missing
     init_db()
 
-    bots = [TradingBot(inst_id) for inst_id in INSTRUMENTS]
-    logger.info(f"Bot started — instruments: {INSTRUMENTS}")
+    if config.STRATEGY_MODE == "xsmom":
+        bot = XsmomBot()
+        logger.info(f"Bot started — XSMOM mode (RP2 X1 paper trade), "
+                    f"universe: {xsmom.UNIVERSE}{' [DRY RUN]' if config.DRY_RUN else ''}")
+        bot.tick()          # immediate check covers rebalances missed during downtime
+        schedule.every(5).minutes.do(bot.tick)
+        schedule.every(60).minutes.do(bot.log_snapshot)
+    else:
+        bots = [TradingBot(inst_id) for inst_id in INSTRUMENTS]
+        logger.info(f"Bot started — instruments: {INSTRUMENTS}")
 
-    for bot in bots:
-        bot.run_strategy()   # run immediately on startup, don't wait for the first interval
-        schedule.every(STRATEGY_INTERVAL_MIN).minutes.do(bot.run_strategy)
-        schedule.every(MONITOR_INTERVAL_SEC).seconds.do(bot.monitor_position)
+        for bot in bots:
+            bot.run_strategy()   # run immediately on startup, don't wait for the first interval
+            schedule.every(STRATEGY_INTERVAL_MIN).minutes.do(bot.run_strategy)
+            schedule.every(MONITOR_INTERVAL_SEC).seconds.do(bot.monitor_position)
 
     schedule.every(12).hours.do(_run_quant_report)
 

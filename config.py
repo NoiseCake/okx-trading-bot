@@ -16,6 +16,14 @@ PASSPHRASE = os.getenv("OKX_PASSPHRASE", "")
 # "1" = paper trading (safe demo account), "0" = real live trading with real money
 FLAG = os.getenv("OKX_FLAG", "1")
 
+# "xsmom" = X1 weekly cross-sectional momentum (RP2 paper trade)
+# "combined" = legacy 1H CombinedStrategy — kept as the rollback path
+STRATEGY_MODE = os.getenv("STRATEGY_MODE", "combined")
+
+# DRY_RUN=1 logs intended orders without sending them (local smoke tests against
+# the shared demo account must not place real rebalance orders).
+DRY_RUN = os.getenv("DRY_RUN", "0") == "1"
+
 def validate() -> None:
     """Raise a clear error if any OKX credential is missing.
 

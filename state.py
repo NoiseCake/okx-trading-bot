@@ -137,3 +137,39 @@ class BotState:
             return state
         except Exception:
             return cls(inst_id=inst_id)
+
+
+@dataclass
+class XsmomState:
+    """Runtime state for the X1 weekly-rebalance mode. One file for the whole
+    portfolio (the strategy is portfolio-level, unlike the per-instrument 1H
+    bot). Only two facts must survive a restart: which rebalance was last
+    completed, and what it targeted."""
+
+    last_rebalance: str = ""                       # ISO date of the acted-on close
+    targets: dict = field(default_factory=dict)    # inst_id -> weight at that close
+
+    _FILE = "bot_state_xsmom.json"
+
+    def save(self) -> None:
+        path = os.path.join(DATA_DIR, self._FILE)
+        tmp = path + ".tmp"
+        with open(tmp, "w") as f:
+            json.dump({"last_rebalance": self.last_rebalance, "targets": self.targets},
+                      f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp, path)
+
+    @classmethod
+    def load(cls) -> XsmomState:
+        path = os.path.join(DATA_DIR, cls._FILE)
+        if not os.path.exists(path):
+            return cls()
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            return cls(last_rebalance=str(data.get("last_rebalance", "")),
+                       targets=dict(data.get("targets", {})))
+        except Exception:
+            return cls()

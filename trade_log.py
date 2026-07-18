@@ -83,6 +83,22 @@ def init_db() -> None:
                 ts          TEXT,
                 equity_usdt REAL    -- total USDT value of account at snapshot time
             );
+
+            CREATE TABLE IF NOT EXISTS rebalances (
+                id             INTEGER PRIMARY KEY AUTOINCREMENT,
+                ts             TEXT,     -- UTC ISO timestamp of execution
+                decision_date  TEXT,     -- UTC date of the daily close acted on
+                inst_id        TEXT,
+                side           TEXT,     -- 'buy' / 'sell'
+                size           REAL,     -- base-ccy quantity filled
+                fill_price     REAL,     -- avgPx from OKX (0 if unavailable)
+                decision_close REAL,     -- the close the decision was made on
+                notional       REAL,     -- USDT value of the order
+                target_weight  REAL,     -- portfolio weight this order moves toward
+                score          REAL,     -- 28d momentum score at decision
+                catch_up       INTEGER DEFAULT 0,  -- 1 if executed late after downtime
+                dry_run        INTEGER DEFAULT 0
+            );
         """)
 
     # Migration: add inst_id to tables that existed before multi-instrument support
@@ -211,6 +227,34 @@ def find_last_open_trade(inst_id: str) -> dict | None:
             (inst_id,),
         ).fetchone()
     return dict(row) if row else None
+
+
+# ── Rebalances (xsmom mode) ───────────────────────────────────────────────────────
+
+def log_rebalance(
+    decision_date: str,
+    inst_id: str,
+    side: str,
+    size: float,
+    fill_price: float,
+    decision_close: float,
+    notional: float,
+    target_weight: float,
+    score: float,
+    catch_up: bool = False,
+    dry_run: bool = False,
+) -> None:
+    """One row per rebalance order. decision_close vs fill_price is the raw
+    material for the paper-trade slippage criterion (RP2 protocol)."""
+    with _conn() as con:
+        con.execute(
+            """INSERT INTO rebalances
+               (ts, decision_date, inst_id, side, size, fill_price, decision_close,
+                notional, target_weight, score, catch_up, dry_run)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (_now(), decision_date, inst_id, side, size, fill_price, decision_close,
+             notional, target_weight, score, int(catch_up), int(dry_run)),
+        )
 
 
 # ── Balance ───────────────────────────────────────────────────────────────────────
